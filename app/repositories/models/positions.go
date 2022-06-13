@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type TmpPositions struct {
+type Positions struct {
 	Base
 	ApiID      int64
 	Exchange   string
@@ -18,6 +18,6 @@ type TmpPositions struct {
 	CreatedAt  time.Time
 }
 
-func (t *TmpPositions) TableName() string {
+func (t *Positions) TableName() string {
 	return "tmp_positions"
 }

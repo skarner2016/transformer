@@ -24,9 +24,13 @@ func GetApi() (apiID int64, apiKey, apiSecret string) {
 func TestSpotService_GetAssetPrice(t *testing.T) {
 	spot := NewSpotService(GetApi())
 
-	err := spot.GetSetSymbolPrice()
+	spm, err := spot.GetSetSymbolPrice()
 	if err != nil {
 		t.Error(err)
+	}
+
+	for s, f := range spm {
+		fmt.Println(s, f)
 	}
 }
 

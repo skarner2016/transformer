@@ -4,12 +4,12 @@ import (
 	"context"
 	"github.com/adshao/go-binance/v2"
 	"github.com/adshao/go-binance/v2/futures"
+	"strconv"
+	"time"
 	"transformer/app/enums/exchange"
 	"transformer/app/repositories/models"
 	"transformer/app/repositories/symbolPriceRepository"
 	"transformer/library/log"
-	"strconv"
-	"time"
 )
 
 type FutureService struct {
@@ -27,7 +27,7 @@ func NewFutureService(apiID int64, apiKey, apiSecret string) *FutureService {
 	}
 }
 
-func (f *FutureService) GetAccount() ([]*models.AssetCurrencies, []*models.TmpPositions, error) {
+func (f *FutureService) GetAccount() ([]*models.AssetCurrencies, []*models.Positions, error) {
 	accountInfo, err := f.Client.NewGetAccountService().Do(context.Background())
 	if err != nil {
 		return nil, nil, err
@@ -69,7 +69,7 @@ func (f *FutureService) GetAccount() ([]*models.AssetCurrencies, []*models.TmpPo
 		cs = append(cs, tmp)
 	}
 
-	ps := make([]*models.TmpPositions, 0)
+	ps := make([]*models.Positions, 0)
 	for _, p := range accountInfo.Positions {
 		amt, err := strconv.ParseFloat(p.PositionAmt, 64)
 		if err != nil {
@@ -104,7 +104,7 @@ func (f *FutureService) GetAccount() ([]*models.AssetCurrencies, []*models.TmpPo
 			side = exchange.PositionSideShort
 		}
 
-		tmp := &models.TmpPositions{
+		tmp := &models.Positions{
 			ApiID:      f.ApiID,
 			Exchange:   f.Exchange,
 			Symbol:     p.Symbol,

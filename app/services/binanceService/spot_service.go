@@ -22,6 +22,7 @@ import (
 type SpotService struct {
 	*Binance
 	Client *binance.Client
+	SymbolPriceMap map[string]float64
 }
 
 func NewSpotService(apiID int64, apiKey, apiSecret string) *SpotService {
@@ -34,24 +35,31 @@ func NewSpotService(apiID int64, apiKey, apiSecret string) *SpotService {
 	}
 }
 
-func (s *SpotService) GetSetSymbolPrice() error {
+func (s *SpotService) GetSetSymbolPrice() (map[string]float64, error) {
 	symbolPrices, err := s.Client.NewListPricesService().Do(context.Background())
 	if err != nil {
 		log.NewLogger().Error(err)
-		return err
+		return nil,err
 	}
 
+	sp := make(map[string]float64, 0)
 	spm := make(map[string]interface{}, 0)
 	for _, symbolPrice := range symbolPrices {
 		price, err := strconv.ParseFloat(symbolPrice.Price, 64)
 		if err != nil {
 			log.NewLogger().Error(err)
-			return err
+			return nil,err
 		}
 		spm[symbolPrice.Symbol] = price
+		sp[symbolPrice.Symbol] = price
 	}
 
-	return symbolPriceRepository.NewSymbolPriceRepository().SetSymbolPrice(spm)
+	err = symbolPriceRepository.NewSymbolPriceRepository().SetSymbolPrice(spm)
+	if err != nil {
+		return nil, err
+	}
+
+	return sp, nil
 }
 
 func (s *SpotService) GetSymbolInfo() error {
